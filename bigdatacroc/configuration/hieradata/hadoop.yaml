@@ -1,0 +1,67 @@
+---
+zookeeper::ports:
+  hadoop:
+    peerport: '2993'
+    clientport: '2381'
+    leaderport: '3993'
+  api:
+    peerport: '2994'
+    clientport: '2481'
+    leaderport: '3994'
+zookeeper::quorumsrv:
+  hadoop:
+    mp13dshdz01.cloud.cloud4.local: 0
+    mp13dshdz02.cloud.cloud4.local: 1
+    mp13dshdz03.cloud.cloud4.local: 2
+  api:
+    mp13dsapz01.dmz.cloud4.local: 0
+    mp13dsapz02.dmz.cloud4.local: 1
+    mp13dsapz03.dmz.cloud4.local: 2
+zookeeper::scheme: zk
+hadoop::journalnodeport: '8485' 
+kafka::brokers:
+  mp13dsqueue01.cloud.cloud4.local:
+    id: 1
+  mp13dsqueue02.cloud.cloud4.local:
+    id: 2
+kafka::broker_port: 9092
+es::clustername: 'CROC-DS-ES'
+es::masternode: 'mp13dsesm01.cloud.cloud4.local'
+es::masternode_port: 9200
+es::http_port: 9200
+es::transport_port: 9300
+es::nodes:
+  - mp13dsesd01.cloud.cloud4.local
+  - mp13dsesd02.cloud.cloud4.local
+  - mp13dsesd03.cloud.cloud4.local
+  - mp13dsesd04.cloud.cloud4.local
+   
+ha::keepalive: 2
+ha::deadtime: 30
+ha::warntime: 10
+ha::initdead: 35
+ha::udpport: 694
+ha::nodes:
+  - mp13dsapi01
+  - mp13dsapi02
+ha::autofailback: 'off'
+ha::preferednode: mp13dsapi01
+ha::kafkanlbaddress: '10.168.193.60'
+
+confluentapp::kafkarest::package: 'confluent-kafka-rest' 
+confluentapp::kafkarest::version: '2.0.1-1'
+confluentapp::kafkarest::schemaregistryurl: 'http://localhost:8181'
+confluentapp::kafkarest::compression_type: 'snappy'
+confluentapp::kafkarest::port: 8182
+confluentapp::kafkarest::consumer_request_max_bytes: 5242880
+confluentapp::kafkarest::debug: 'false'
+confluentapp::kafkarest::javaheapopts: '-Xms1G -Xmx1G'
+confluentapp::kafkarest::jvmperfoptions: '-server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35'
+confluentapp::schemaregistry::package: 'confluent-schema-registry'
+confluentapp::schemaregistry::version: '2.0.1-1'
+confluentapp::schemaregistry::port: '8181'
+confluentapp::schemaregistry::kafkastoretopic: '_schemas'
+confluentapp::schemaregistry::groupid: 'connect-cluster'
+confluentapp::schemaregistry::url: 'http://localhost:8181'
+confluentapp::schemaregistry::bootstrapservers: 'localhost:9092'
+confluentapp::schemaregistry::hname:

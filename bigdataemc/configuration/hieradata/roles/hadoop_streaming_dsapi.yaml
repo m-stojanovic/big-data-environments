@@ -1,0 +1,5 @@
+---
+# those settings doesn't have any meaning but we need them to render config for hadoop-client (which probablt does not need all those settings but we're using common template for 3 types of hosts)
+hadoop::config::yarn_nodemanager_resource_memory_mb: '24576'
+hadoop::config::yarn_scheduler_maximum_allocation_mb: '24576'
+hadoop::config::yarn_scheduler_maximum_allocation_vcores: '288'

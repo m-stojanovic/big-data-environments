@@ -1,0 +1,66 @@
+hbase-client {
+  quorum = "<%= scope['datastore::hd_zookeeper_quorum'] %>"
+  client-port = <%= scope['datastore::hd_zookeeper_clientport'] %>
+      znode-parent = "<%= @hbase_znode %>"
+}
+
+elasticsearch {
+  nodes: "<%= scope['dsglobals::es_nodes'].join(",") %>"
+  port: <%= scope['dsglobals::es_http_port'] %>
+      index-prefix: <%= @es_index_prefix %>
+}
+
+kafka {
+  bootstrap-servers: "<%= scope['datastore::kafka_brokers'] %>"
+  topic: <%= @topic %>
+}
+
+hdfs {
+  host: <%= @hdfs_host %>
+      port: <%= @hdfs_port %>
+}
+
+data {
+  user-profile {
+    tenant-ids = [
+    <%= @tenants.join(",") %>
+    ]
+
+    snapshot-date: <%= @snapshot_date %>
+
+  }
+}
+
+userserviceClient {
+  connect {
+    scheme = "<%= scope['datastore::zk_scheme'] %>"
+    quorum  = "<%= scope['datastore::hd_zookeeper_quorum'] %>"
+    path = "/services/userevent"
+  }
+  client {
+    maxRetries = 3
+    thriftMux = true
+    workerThreads = 30
+    checkServiceAvailability = true
+  }
+  processing {
+    timeout = 5.seconds
+  }
+}
+
+userprofileClient {
+  connect {
+    scheme = "<%= scope['datastore::zk_scheme'] %>"
+    quorum  = "<%= scope['datastore::hd_zookeeper_quorum'] %>"
+    path = "/services/userprofile"
+  }
+  client {
+    maxRetries = 3
+    thriftMux = true
+    workerThreads = 30
+    checkServiceAvailability = true
+  }
+  processing {
+    timeout = 5.seconds
+  }
+}

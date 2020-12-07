@@ -1,0 +1,64 @@
+// See wiki:[DataStoreService.Deployment]
+
+selectionEngine {
+    port = <%= @service_port %>
+
+    nodeCounter = "<%= @node_counter %>"
+    nodeCountTimeout = <%= @node_count_timeout %>
+    supportedUserDataTypes = <%= @supported_user_data_types %>
+    tenantWhitelist = <%= @tenant_whitelist %>
+
+    scrollTimeoutSec = <%= @scroll_timeout_sec %>
+
+    ## ZK announcement - needed for monitoring
+    scheme = "<%= scope['datastore::zk_scheme'] %>"
+    quorum  = "<%= scope['datastore::api_zookeeper_quorum'] %>"
+    announcepath = "<%= @announce_path %>"
+    shard = <%= @shard %>
+    announcetimeout = <%= @announce_timeout %>
+
+    elasticsearch {
+        httpHosts = "<%= scope['datastore::es_http_nodes'] %>"
+
+        rdQueryScrollSize = <%= @rd_query_scroll_size %>
+        rdChunkingThreshold = <%= @rd_chunking_threshold %>
+        rdQueryTimeout = <%= @rd_query_timeout %>
+        rdFixedThreadPool = <%= @rd_fixed_thread_pool %>
+        rdNumberOfElementsInChunk  = <%= @rd_number_of_elements_in_chunk %>
+        rdPartFixedThreadPool = <%= @rd_part_fixed_thread_pool %>
+        rdPartNumberOfElementsInChunk = <%= @rd_part_number_of_elements_in_chunk %>
+        connectionTimeout = <%= @es_connection_timeout %>
+        socketTimeout = <%= @es_socket_timeout %>
+    }
+
+    async {
+        expireOrderAfterMinutes = <%= @async_expire_order_after_minutes %>
+        cleanFinishedAfterHours = <%= @async_clean_finished_after_hours %>
+        cleanAllAfterDays = <%= @async_clean_all_after_days %>
+        localStorePath = "<%= @async_store_path %>"
+        storePath = "<%= @async_hdfs_store_path %>"
+        core-site.path = "file:///etc/hadoop/conf/core-site.xml"
+        hdfs-site.path = "file:///etc/hadoop/conf/hdfs-site.xml"
+        quartz.filename = "quartz.properties"
+    }
+
+    postgres {
+        host = "<%= @postgres_host_port %>"
+        dbname = "<%= @postgres_dbname %>"
+        login = "<%= @postgres_login %>"
+        password = "<%= @postgres_password %>"
+        poolSize = <%= @postgres_pool_size %>
+        defaultTimeoutSec = <%= @postgres_default_timeout_sec %>
+        validateTimeoutSec = <%= @postgres_validate_timeout_sec %>
+        testOnBorrow = <%= @postgres_test_on_borrow %>
+        maxIdle = <%= @postgres_max_idle %>
+        maxTotal = <%= @postgres_max_total %>
+        maxWaitMillis = <%= @postgres_max_wait_millis %>
+        maxConnLifetimeMillis = <%= @postgres_max_conn_lifetime_millis %>
+        testWhileIdle = <%= @postgres_test_while_idle %>
+    }
+
+    optimizer {
+        enabled = <%= @optimizer_enabled %>
+    }
+}

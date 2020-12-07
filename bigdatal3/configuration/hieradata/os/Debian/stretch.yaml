@@ -1,0 +1,14 @@
+---
+apt::sources:
+  "debian_stretch_hadoopdev":
+    location: http://image-priv.muc.domeus.com/apt/teradata/hadoopdev/
+    release: wheezy
+    repos: main
+    key:
+      id: 0CE7292F914B3A14487231191B67A56EA8EE1EE1
+      source: http://image-priv.muc.domeus.com/apt/teradata/hadoopdev/pubkey.gpg
+    allow_unsigned: true
+  "debian_stretch_update":
+    location: http://image-priv.muc.domeus.com/apt/debian
+    release: "stretch-updates"
+    repos: main contrib non-free

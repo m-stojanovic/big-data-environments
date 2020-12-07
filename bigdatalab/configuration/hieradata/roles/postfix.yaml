@@ -1,0 +1,9 @@
+---
+# postfix installation
+postfix::packages:
+  postfix:
+    ensure: "2.11.3-1+deb8u2"
+
+postfix::config::files:
+  "/etc/mailname":
+  "/etc/postfix/main.cf":

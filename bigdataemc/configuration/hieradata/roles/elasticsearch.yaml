@@ -1,0 +1,1067 @@
+---
+profiles::nrpe::checks:
+  check_es_docker:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 4:4 -C java -a Elasticsearch
+  check_es:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 2:2 -C java -a Elasticsearch
+  check_procinfo:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procinfo.sh
+  check_disks:
+    ensure: present
+    command: /usr/bin/sudo /usr/lib/nagios/plugins/check_disk -e -l -w 13% -c 8% -W 13% -K 8% -r / -I /var/lib/docker/ -I /run/docker
+  check_openmanage:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_openmanage -p --check amperage=0
+  check_elastic_health:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_elastic_health -H %{::hostname}-es1
+
+collectd::package_ensure: '5.7.1-1.1'
+collectd::minimum_version: '5.7'
+
+collectd_plugins:
+  - collectd::plugin::df
+
+collectd::plugin::df:
+  mountpoints: [ '/^data[1-9][0-9]*/' ]
+
+es::config::disk_type: ssd
+es::config::allocation_balance_shard: 0.25
+es::config::discovery_zen_ping_timeout: 30s
+es::cluster_name: DS-EMC-ES
+es::unicast_hosts: ['dsesm1200-es1:9300','dsesm1200-es2:9300','dsesm1201-es1:9300','dsesm1201-es2:9300','dsesd1205-es1:9300','dsesd1205-es2:9300','dsesd1205-es3:9300','dsesd1205-es4:9300','dsesd1206-es1:9300','dsesd1206-es2:9300','dsesd1206-es3:9300','dsesd1206-es4:9300','dsesd1207-es1:9300','dsesd1207-es2:9300','dsesd1207-es3:9300','dsesd1207-es4:9300','dsesd1208-es1:9300','dsesd1208-es2:9300','dsesd1208-es3:9300','dsesd1208-es4:9300','dsesd1209-es1:9300','dsesd1209-es2:9300','dsesd1209-es3:9300','dsesd1209-es4:9300','dsesd1210-es1:9300', 'dsesd1210-es1:9300', 'dsesd1210-es3:9300', 'dsesd1210-es4:9300','dsesd1211-es1:9300', 'dsesd1211-es2:9300', 'dsesd1211-es3:9300', 'dsesd1211-es4:9300', 'dsesd1211-es4:9300', 'dsesd1212-es1:9300', 'dsesd1212-es2:9300', 'dsesd1212-es3:9300', 'dsesd1212-es4:9300', 'dsesd1213-es1:9300', 'dsesd1213-es2:9300', 'dsesd1213-es3:9300', 'dsesd1213-es4:9300']
+es::data_path: '/DATA1/es-data,/DATA2/es-data,/DATA3/es-data,/DATA4/es-data'
+es::logs_path: '/DATA1/elasticsearch'
+es::network_mode: bridge
+es::common_settings:
+  script.painless.regex.enabled: true
+es::docker::dsesm1200:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.220'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 16g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.221'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 16g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesm1201:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.203'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 16g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.204'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 16g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1205:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.222'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.223'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.224"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.225"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1206:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.226'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.227'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.228"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.229"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1207:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.230'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.231'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.232"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.233"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1208:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.234'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.235'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.236"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.237"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1209:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.238'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.239'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.240"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.241"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1210:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.242'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.243'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.244"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.245"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1211:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.246'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.247'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.248"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.249"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1212:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.250'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.251'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.252"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.253"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1213:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.16'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.17'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.18"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.19"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1214:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.12'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.13'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.14"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.15"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1215:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.80'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.81'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.82"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.83"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1216:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.84'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.85'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.86"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.87"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1217:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.88'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.89'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.90"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.76"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1218:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.77'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.78'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.79"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.95"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1219:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.96'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.97'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.98"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.99"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1220:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.32'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.33'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.34"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.35"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::dsesd1221:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data1:/DATA1','/data2:/DATA2' ]
+      d_ipaddr: '10.128.244.36'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es2:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data3:/DATA1','/data4:/DATA2' ]
+      d_ipaddr: '10.128.244.37'
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es3:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data5:/DATA1','/data6:/DATA2' ]
+      d_ipaddr: "10.128.244.38"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+    es4:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/data7:/DATA1','/data8:/DATA2' ]
+      d_ipaddr: "10.128.244.39"
+      d_subnet: 21
+      d_path: '/DATA1/es-data,/DATA2/es-data'
+      d_gateway: '10.128.244.1'
+      heapsizemb: 30g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,user-*,rd_*"'
+      disk_type: "pandg"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"

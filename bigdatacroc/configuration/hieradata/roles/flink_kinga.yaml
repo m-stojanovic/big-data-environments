@@ -1,0 +1,34 @@
+---
+lookup_options:
+  flink::packages:
+    merge: hash
+
+# flink
+flink::jobmanager_web_submit_enabled: true
+flink::taskmanager_tmp_in_subdir: true
+
+# flink packages
+flink::packages:
+  flink-common-libs:
+    ensure: '0.0.11'
+
+# flink applications
+flink::applications::type: 'exports'
+flink::applications::defaults: {}
+flink::applications::list: {}
+
+# flink manager configuration
+flink::manager::apps:
+  snapshots:
+    defaults:
+      yarn_session_container_suffix: 'jobs'
+      yarn_session_jm_memory: 12288
+      yarn_session_tm_memory: 6144
+      yarn_session_queue: 'etl_jobs'
+      put_properties_file: true
+      flink_additional_parameters: 'env.java.opts.jobmanager=-XX:MaxDirectMemorySize=1280m;env.java.opts.taskmanager=-XX:MaxDirectMemorySize=2304m;akka.ask.timeout=3600s;akka.client.timeout=3600s;web.history=32;web.timeout=3600000;taskmanager.network.memory.fraction=0.3;taskmanager.network.memory.max=2147483648'
+
+  flink_t0-member-attr:
+    defaults:
+      yarn_session_tm_memory: 4096
+      flink_additional_parameters: 'env.java.opts.jobmanager=-XX:MaxDirectMemorySize=1280m;web.history=100'

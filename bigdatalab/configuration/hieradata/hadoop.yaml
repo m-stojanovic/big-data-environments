@@ -1,0 +1,65 @@
+---
+zookeeper::ports:
+  hadoop:
+    peerport: '2100'
+    clientport: '2181'
+    leaderport: '3100'
+  api:
+    peerport: '2100'
+    clientport: '2181'
+    leaderport: '3100'
+zookeeper::quorumsrv:
+  hadoop:
+    hdplab22.muc.domeus.com: 0
+    hdplab23.muc.domeus.com: 1
+    hdplab24.muc.domeus.com: 2
+  api:
+    hdplab22.muc.domeus.com: 0
+    hdplab23.muc.domeus.com: 1
+    hdplab24.muc.domeus.com: 2
+zookeeper::scheme: zk
+hadoop::journalnodeport: '8485'
+kafka::brokers:
+  hdplab20.muc.domeus.com:
+    id: 1
+  hdplab21.muc.domeus.com:
+    id: 2
+kafka::broker_port: 9092
+
+es::clustername: 'ES6-UPGRADE'
+es::masternode: 'elastic01'
+es::masternode_port: 9200
+es::http_port: 9200
+es::transport_port: 9300
+es::nodes:
+  - 10.128.251.40
+  - 10.128.251.60
+  - 10.128.251.56
+  - 10.128.251.66
+# ^ we need proper DNS for them
+
+kafka::kafkamanager::packages:
+  kafka-manager:
+    ensure: '2.0.0.2'
+confluentapp::kafkarest::package: 'confluent-kafka-rest' 
+confluentapp::kafkarest::version: '2.0.1-1'
+confluentapp::kafkarest::schemaregistryurl: 'http://hdplab22.muc.domeus.com:8099'
+confluentapp::kafkarest::compression_type: 'snappy'
+confluentapp::kafkarest::port: 8182
+confluentapp::kafkarest::consumer_request_max_bytes: 5242880
+confluentapp::kafkarest::debug: 'false'
+confluentapp::kafkarest::javaheapopts: '-Xms1G -Xmx1G'
+confluentapp::kafkarest::jvmperfoptions: '-server -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:+CMSScavengeBeforeRemark -XX:+DisableExplicitGC -Djava.awt.headless=true'
+confluentapp::schemaregistry::packages:
+  confluent-common:
+    ensure: '5.3.1-1'
+  confluent-rest-utils:
+    ensure: '5.3.1-1'
+  confluent-schema-registry:
+    ensure: '5.3.1-1'
+confluentapp::schemaregistry::port: '8099'
+confluentapp::schemaregistry::kafkastoretopic: '_schemas'
+confluentapp::schemaregistry::groupid: 'connect-cluster'
+confluentapp::schemaregistry::url: 'http://localhost:8081'
+confluentapp::schemaregistry::bootstrapservers: 'localhost:9092'
+confluentapp::schemaregistry::hname:

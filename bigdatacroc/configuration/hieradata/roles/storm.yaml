@@ -1,0 +1,11 @@
+---
+profiles::nrpe::checks:
+  check_storm_nimbus:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a storm.daemon.nimbus
+  check_storm_ui:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a storm.ui.core
+  check_storm_supervisor:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a storm.daemon.supervisor

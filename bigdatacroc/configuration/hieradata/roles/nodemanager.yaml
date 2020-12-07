@@ -1,0 +1,20 @@
+---
+# Common hadoop limits
+limits::entries:
+  'hdfs/nofile':
+    both: 262144
+  'hdfs/nproc':
+    both: 65536
+  'mapred/nofile':
+    both: 262144
+  'mapred/nproc':
+    both: 65536
+  'yarn/nofile':
+    both: 524288
+  'yarn/nproc':
+    both: 65536
+
+profiles::nrpe::checks:
+  check_yarn_nodemanager:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a yarn-nodemanager

@@ -1,0 +1,10 @@
+bootstrap.servers: <%= @kafka_brokers %>
+zookeeper.connect: <%= @zookeeper_connect %>
+ds.schema.registry.url: zk!<%= @zookeeper_connect %>!<%= @defaults['ds_schema_registry_path'] %>
+<% @variables.each do |k,v| -%>
+<%= k %>: <%= v %>
+<% end -%>
+
+hbase.rootdir: <%= @defaults['hbase_rootdir'] %>
+hbase.zookeeper.quorum: <%= @zookeeper_connect_hbase %>
+hbase.zookeeper.property.clientPort: <%= @zookeeper_port %>

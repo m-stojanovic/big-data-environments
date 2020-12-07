@@ -1,0 +1,55 @@
+---
+nginx::nginx_servers:  
+  'kafka-lb-emc.muc.domeus.com':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    proxy_set_header: 
+      - 'Host $http_host'
+      - 'X-Public-IP 195.140.186.31'
+  'schema-lb-emc.muc.domeus.com':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    proxy_set_header: 
+      - 'Host $http_host'
+nginx::nginx_upstreams:
+  'dsapiemc':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi1005.muc.domeus.com:8182':
+        server: 'dsapi1005.muc.domeus.com'
+        port: 8182
+      'dsapi1006.muc.domeus.com:8182':
+        server: 'dsapi1005.muc.domeus.com'
+        port: 8182
+        backup: true
+  'schemaemc':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi1005.muc.domeus.com:8181':
+        server: 'dsapi1005.muc.domeus.com'
+        port: 8181
+      'dsapi1006.muc.domeus.com:8181':
+        server: 'dsapi1005.muc.domeus.com'
+        port: 8181
+        backup: true
+nginx::nginx_locations:
+  'kafka_lb':
+    location: '/'
+    server: 'kafka-lb-emc.muc.domeus.com'
+    proxy: 'http://dsapiemc/$1'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'
+  'schema':
+    location: '/'
+    server: 'schema-lb-emc.muc.domeus.com'
+    proxy: 'http://schemaemc/$1'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'

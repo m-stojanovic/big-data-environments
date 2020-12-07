@@ -1,0 +1,16 @@
+---
+apt::sources:
+  "debian_jessie_cloudera_cdh5_14_0":
+    location: http://image-priv.muc.domeus.com/apt/archive.cloudera.com/cdh5/debian/jessie/amd64/cdh
+    release: jessie-cdh5.14.0
+    repos: contrib
+    key:
+      id: F36A89E33CC1BD0F71079007327574EE02A818DD
+      source: http://image-l3.muc.domeus.com/apt/repo-keys/cloudera.gpg
+  "debian_jessie_dell":
+    location: http://image-priv.muc.domeus.com/apt/linux.dell.com/repo/community/debian
+    release: jessie
+    repos: openmanage/840
+    key:
+      id: 42550ABD1E80D7C1BC0BAD851285491434D8786F
+      source: http://image-priv.muc.domeus.com/apt/omsa-debian/pubkey.gpg

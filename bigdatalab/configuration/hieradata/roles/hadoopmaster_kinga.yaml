@@ -1,0 +1,5 @@
+---
+# Custom hadoop parameteres for kinga cluster master node
+hadoop::config::yarn_nodemanager_resource_memory_mb: '32768'
+hadoop::config::yarn_scheduler_maximum_allocation_mb: '32768'
+hadoop::config::yarn_scheduler_maximum_allocation_vcores: '320'

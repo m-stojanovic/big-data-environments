@@ -1,0 +1,39 @@
+---
+profiles::nrpe::checks:
+  check_flink_exports_26:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_flink_containers.sh snapshots 26
+    sudo: true
+  check_flink_exports_27:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_flink_containers.sh snapshots 27
+    sudo: true
+
+# flink
+flink::jobmanager_web_submit_enabled: true
+flink::taskmanager_tmp_in_subdir: true
+flink::jobmanager_execution_failover_strategy: region
+
+# flink packages
+flink::packages:
+  flink:
+    ensure: '1.9.2-2'
+  flink-common-libs:
+    ensure: '0.1.1'
+
+# flink applications
+flink::applications::type: 'exports'
+flink::applications::defaults: {}
+flink::applications::list: {}
+
+# flink manager configuration
+flink::manager::apps:
+  snapshots:
+    defaults:
+      yarn_session_container_suffix: jobs
+      yarn_session_jm_memory: 2048
+      yarn_session_tm_memory: 8192
+      yarn_session_tm_slots: 2
+      yarn_session_queue: exports
+      flink_additional_parameters: 'env.java.opts.jobmanager=-XX:NativeMemoryTracking=summary -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics -XX:MaxDirectMemorySize=384m;env.java.opts.taskmanager=-XX:NativeMemoryTracking=summary -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics -XX:MaxDirectMemorySize=1024m;web.history=100;web.timeout=300000;akka.ask.timeout=300s;akka.client.timeout=300s'
+      put_properties_file: 'true'

@@ -1,0 +1,44 @@
+---
+kafka::auto_create_topics_enable: false
+kafka::classpath: 
+kafka::default_replication_factor: 2
+kafka::delete_topic_enable: true
+kafka::enabled: true
+kafka::heap_opts: '-Xms12G -Xmx12G'
+kafka::java_home: '/usr/lib/jvm/java-8-oracle'
+kafka::java_opts: 
+kafka::jmx_port: 9999
+kafka::jvm_performance_opts: '-server -XX:PermSize=512m -XX:MaxPermSize=1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35'
+kafka::log_cleanup_interval_mins: 1
+kafka::log_cleanup_policy: 'delete'
+kafka::log_dirs:
+  - '/DATA/kafka-logs'
+kafka::log_flush_interval_messages: 10000
+kafka::log_flush_interval_ms: 3000
+kafka::log_retention_bytes: 
+kafka::log_retention_hours: 1008
+kafka::log_segment_bytes: 536870912
+kafka::log4jlogdir: '/var/log/kafka'
+kafka::metrics_properties: 
+kafka::nofiles_ulimit: 131072
+kafka::num_io_threads: 64
+kafka::num_network_threads: 32
+kafka::num_partitions: 40
+kafka::num_replica_fetchers: 32
+kafka::package:
+  - 'kafka'
+  - 'kafka-server'
+kafka::replica_fetch_max_bytes: 1048576
+kafka::replica_lag_max_messages: 
+kafka::replica_lag_time_max_ms:
+kafka::replica_socket_receive_buffer_bytes: 
+kafka::replica_socket_timeout_ms:
+kafka::socket_receive_buffer_bytes: 1048576
+kafka::socket_request_max_bytes: 104857600
+kafka::socket_send_buffer_bytes: 1048576
+kafka::version: '0.9.0+kafka2.0.2-1.2.0.2.p0.5~jessie-kafka2.0.2'
+kafka::zookeeper_chroot: '/kafka'
+kafka::zookeeper_connection_timeout_ms: 6000
+kafka::zookeeper_session_timeout_ms: 60000
+kafka::java::packages: [ 'oracle-java8-installer', 'oracle-java8-set-default']
+kafka::java::version: '8u161-amd64-mapp'

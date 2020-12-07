@@ -1,0 +1,307 @@
+---
+lookup_options:
+  apt::sources:
+    merge: hash
+  profiles::baseprofile::packages:
+    merge: hash
+  profiles::baseprofile::ssh_keys:
+    merge: hash
+  profiles::nrpe::checks:
+    merge: hash
+  profiles::firewall::rules::ipv4:
+    merge: hash
+  profiles::firewall::rules::ipv6:
+    merge: hash
+  flink::manager::apps:
+    merge: hash
+  flink::manager::packages:
+    merge: hash
+  nginx::nginx_upstreams:
+    merge: hash
+  nginx::nginx_locations:
+    merge: hash
+  nginx::nginx_servers:
+    merge: hash
+    
+puppet_agent::package_version: '6.13.0'
+puppet_agent::is_pe: false
+puppet_agent::manage_repo: false
+puppet_agent::service_names:
+  - 'puppet'
+
+profiles::baseprofile::timezone: Europe/Berlin
+
+profiles::baseprofile::hosts: {}
+
+profiles::baseprofile::ntp_servers_list:
+  - ntp.muc.domeus.com
+
+apt::update:
+  frequency: always
+  timeout: 60
+
+apt::purge:
+  sources.list.d: true
+  sources.list: true
+
+profiles::baseprofile::packages:
+  less:
+    version: installed
+    pin: false
+  vim:
+    version: installed
+    pin: false
+  mc:
+    version: installed
+    pin: false
+  bzip2:
+    version: installed
+    pin: false
+  bash-completion:
+    version: installed
+    pin: false
+  curl:
+    version: installed
+    pin: false
+  lsb-release:
+    version: installed
+    pin: false
+  lsof:
+    version: installed
+    pin: false
+  axel:
+    version: installed
+    pin: false
+  dnsutils:
+    version: installed
+    pin: false
+  arping:
+    version: installed
+    pin: false
+  tmux:
+    version: installed
+    pin: false
+  telnet:
+    version: installed
+    pin: false
+  tree:
+    version: installed
+    pin: false
+  iotop:
+    version: installed
+    pin: false
+  htop:
+    version: installed
+    pin: false
+  dstat:
+    version: installed
+    pin: false
+  cryptsetup:
+    version: installed
+    pin: false
+  libsys-statistics-linux-perl:
+    version: installed
+    pin: false
+  net-tools:
+    version: installed
+    pin: false
+  procinfo:
+    version: installed
+    pin: false
+  ethtool:
+    version: installed
+    pin: false
+  python-yaml:
+    version: installed
+    pin: false
+  jq:
+    vesrion: installed
+    pin: false
+  lsscsi:
+    version: installed
+    pin: false
+  sysstat:
+    version: installed
+    pin: false
+  screen:
+    version: installed
+    pin: false
+  ntpdate:
+    version: installed
+    pin: false
+
+nrpe::dont_blame_nrpe: '1'
+nrpe::allowed_hosts:
+  - 127.0.0.1
+  - 192.168.139.73
+  - 'hdplab34.muclab.local'
+
+logrotate::ensure: latest
+logrotate::config:
+  compress: true
+  delaycompress: true
+  dateext: true
+  ifempty: false
+  rotate_every: day
+  rotate: 21
+
+profiles::nrpe::checks:
+  check_linux_raid:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_linux_raid
+  check_iftraffic:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_iftraffic.sh -i eth0
+  check_users:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_users 10 15
+  check_swap:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_swap -c 25% -w 75%
+  check_load:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_load -w 15,10,5 -c 30,25,20
+  check_zombie_procs:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs 5 10 Z
+  check_ntp:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_ntp_time -H ntp.muc.domeus.com -w 0.5 -c 1 -t 6
+  check_dnscache:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_dns -H cnn.com. -w 5 -c 6
+  check_syslog:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -C rsyslogd -c 1:1 -t 6
+  check_cron:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -C cron -c 1:2 -t 6
+  check_sshd:
+    ensure: present
+    command: '/usr/lib/nagios/plugins/check_procs -C sshd -c 1: -t 6'
+  check_total_procs:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs 250 350
+  check_ntp_time:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_ntp_time -H ntp.muc.domeus.com -w 0.5 -c 1 -t 6
+  check_memory:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_linux_stats.pl -M -w 90,80 -c 95,95
+  check_cpu:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_linux_stats.pl -C -w 90 -c 95 -s 5
+  check_iostat:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_linux_stats.pl -I -w 400,400 -c 600,600 -p sda3,sdb3,sdc3,sdd3
+  check_puppet_agent_process:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_puppet_agent_process.sh
+  check_puppet_agent_last_run:
+    ensure: present
+    command: /usr/bin/sudo /usr/lib/nagios/plugins/check_puppet_agent_last_run.py -w 2100 -c 2700
+  check_disks:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_disk -e -l -w 13% -c 8% -W 13% -K 8% -r / -I /var/lib/docker/ -I /run/docker
+  check_cluster_health:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_cluster_health.py
+  check_procinfo:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procinfo.sh
+
+profiles::baseprofile::ssh_keys:
+  hdplab25:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQC2YQKCsd3f2a0vu/2i0pxt6DLJVUIKVVGLNl1LDbgSOe4U2X9GqHKQJGuVCkxM60qLb3U81eEg6iedW9q3zPpzNoAo3RkinWY03o+CAZg3iaz1jXKWgpMDzraUUG3Fq2EJ+oMLSFYvgnKUU3Iw8DagI5Y80tXHTbaPuVDc22RJ22/HOCZ/uXz5vxnazXNrTk9UnSBE4VprorMt1OxjsjQ538VGdikc1I0bplwCPCxX4wC97eJ6XqGXvuP5uaF1OcwJFBxGWtEKP/X6H/b3HXp8XDDBxXj7kqVbykh40NK1FjO62Nno1lO2avIAEOR2h4EwmRPLAWdlvYKKQvnfiH9F
+  Mladen Antunovic:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAACAQC+ujeP9YU8DH3hcVVBqCEw5S6GZNsaBGwkPZv1hqXeSRzpW01+eK4g36BMUz5ghYNHv7dlSvltkSqtYBxxI7rsLSZVi+sedAYFz1N4xV0FvuTxJn/g45J1UinVJbxYjwBYNW3yxVuy86Tkfebh/Xr9wcwitp6PQPI3VJmHNRQ4YBJIGbXBkE9nwpx3eejLB37YwP34tAUFkcoBJZG9BYMWggBJfOHaSpbwWzdQP4dZ6Qwhf9lCrAEiXXobBS0vm4ZFg0VyxVySKKLQWRo7qHyfXfsGCHXj3WyGWnmV7Fn3DNU8bsc15GAChkLZqJ/DyTqd4buczGwx0FXyjdzGN4sqSfqmYgHdMgt/hn85QICblAcEIaS/Lk0FLaCUz89SMD+xZm3RYh/Vwsf8vyMchIkiMvB4RFAkJ+81iwqMValWdP8yEeMG2T4iGJnJj7UDG6d76OZ4L34UDyOcd9g1MztHyBgWzYretougJnv6kEpL0lu0tZjuiVMtdwUCk/zI1GMP5WlPDHUdDsYzAfUK2ZJ48VuvOrtaVmuRN//tvWpd4ZesOQsxzIRX0GFYIEBEsG4FXXn5BmjCRXSQKQ38RMhc7RSJ1fM6jmReccfU9vqqIbGF7FsPnZO2D+0tR8eqWVBguBt4gICmnCtl6uToslniXMY4Nkd8iueuoIdzZ5F03w==
+  Borys Gogulski:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDP1dV1V0o3rjyEF11+/eNeKaX3Rcw5hELZqnkWWsJQMC6bO3fMmIDNZSuCzbP2c1FsRr4o11Cm5HQmvFqxCU1dOU2Eojw9M/8pnO5v7H9L3K/lYj6DRlJJlidCGObcZNy4qm3INQLD5he2JmkA+wDsZGcqnlxqUuwbJfhZNsvELi/ltxNBJ0IE1LRLBmzKC45ARoTA/FWigKMZR7FL6TbaZbLd88O8PrS/dc0hMVIPdyb9mtfbIr57gK25UP+kj37LrlHzoWt3RvFCVqVsnrUea2SsleDAeVZxI0+3fOp4RE0/9zONbtSIMXqpyWYDQBGZ6TobsjT045hXrPqKXmNT
+  Milos Stojanovic:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDWIksn3xSge/AL3gZFjAkGZybFULj5aWyf0Sa+gHd2p+eoqdcTf3sccPXjCcvWaEV1FRtohZiMFdzaiBOrtYU41knEoA51CS7TmQxxYG2neS6X5KlhBEepg8pG2lJ6mlTHp/42P49xfuBbLA1PU8kwEj6K1ZlPqMYagyovwVvGUdiB4trIbapOuKUuUkxdNCqW3GJtXWMBQCH5aHlAIAK+tfPD2EL0Rsvc/BkPtt1euKZvrjg4+cW9lAimnBgM8UAjoP8a46XJvaSGFf88YM7WHNNq50bmRIcPRrYkQXc60Chl863TnJr/UefzisEv7DzeBOJt0Ln1AqtGHTY4NrUX
+  Wojciech Jozefak:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQCpQt0VboGODOFxEnB1JH3DfSTYSjBo4YZdepDJuVOz+cjCk0VyLy3P1VfY5xXTCRqGUvW8nz+VxrhztXomRudFyGAYAFcookDySFlJ3QJT8TeHhF7L0JyXSfWdPCHIkQjiU8r8sEeMtlU0dBRYfGHgYFrN8cnGj2m/rIDAwVYi3sMQTX2n1/LK/OfPAbshcyajSqFNmDobT0HefpQdiTMJFcvpQ5GIfQFQo4IiZJQWYyYZ2mHiBnhHhEeXtLUK/4idYtQu5RKPS13FhM1637VMJQRld8Pwa+yaaspoVTMuZS7e/YNrpTccnoXj4HFhpUDzop4QrrWXos1PyAtPdhlB
+  Radoslaw Lalowicz:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAACAQDJMgk+OcqAVeTHBnb6VlhiQBrVD4Khplgk59RNmjuWtuk3oXxhz66yshFgrXBgAbWMOE9pG1vFYtBwQUODk5tLoa5ZJ960wAe/snZja3/TjmxB81bkDmrPOcWViELGiz7UQLa/ns2p8Rk3H9C/eiPJT15OPGa0S6YA02Dtq5rWcpJXVkTN4Vw/bddqHNYJTORVn4mxEqanp8gQaJo3BBYMwbhSpjp0qbKGiG3nXN/Yxu5AEdWoCNjAHh32kMO0TRGh2BfnIT7XBD5vA7tAU6dURLAs9XxXB7jlePrhkECayKTcn+++LYQhcb/o/Y2Z0NHdDePStyGU0JM1Qz8sacYPPyVakE1e/WpvGYaChd0TT7toxmFjDJ2l7SgXBjlAw3Za7HzTYLPtNMMjgB1rqWfA0S7YIZI59QV9S6rIdSIJ6RvpMb7kK7l7gSSzgTg/gk0SyfG7MuAdCZR3KYthPUDAa8E5zfWzkE/Z5Me94NI3X+1RYp+OX/BaaCfHLRV6R9PIhnL8DkI2HvFZELtj+44SFbEgpPHENwi1ptQd6SJC1IknM4obRe6bD828uEIbj4HCH+ZvZmCRO+eOVf/seeNRHwxxmOIA8ibUJJnyWQlMQ3CYoTUyn3z2IGbLZlaAfbP7J6hATGLmJeg5m8gMixAFSzPVcd1Y+bzYWUVf4awuDQ==
+  Arkadiusz Chudoba:
+    user: root
+    type: ssh-ed25519
+    key: AAAAC3NzaC1lZDI1NTE5AAAAINOjcqN1FQrWnnmQIGvnaVowcLSWYgvDZDzKiJDYrs4E
+  Adam Augustynski:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAABJQAAAQEAmcUQsheq3vmptpPXX1ZRsidozO0znsmObar9u+6Vj2zgcGMp3R2Ol39vivdjFiActSEjNAlA9uX76oRT2AQdrOz2HRIyd8fiOggRFufu9XzBh4OrHxz18SpM+ycoMKSGYPz9FE3dWx8RsavsvMjcsV3sLvqVbxRpGR5aC3X7eVpI581/OYddT3fKj9AzY7bzoi1QC0k69xiRVXRutjV6TWgJrQRP9L3JPgsxE3x5y0eKW7gQ09HVYwg49/yJAstQZE0CjYxn54NyYLor8xa9rjnLYiMt5Uw7YGncg4fhDxzaQdHq73QjS046v7Vm9ONgP+iaKUf1tZ4D3M9gF9x96Q==
+  Szymon Kasinski:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAABJQAAAQEA4D/1XH4WqkNKjdIU5HHRiZbb4P01hj/MRTSp80siWEN03peeG7DOZzeF0rlJiB44I/nvpv0jHrjXl304rkWr6W6Rqyp4eXj02sbb5Dn3xTkcQKN6yxqSIU7rXflMnbX3+ORD0qtTCbRFUu6CTdkYTp+QTXKIQRPtqXxtg27G/wkfT4oPfSPDfriB6dTwEPRmX4EIKmO9epl2fWIMhzPOybcpps37NMqf5PzTJeir5tCKjJtETdvUloJsJlp6NEnmgjS4KqwUlrtDzH4ncFsrLB4uNE41gAyk7YwU3pAIfJfcVMLZFvtgSqcDkZkttpcOe3ClaZRraNI1Ml3UtUYSYQ==
+  Michal Piskozub:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQC+W2vCYdHABJdwqo5W8dplumWiF272Cy9ZfOQqAD6ZhJ2ixQnhR+xJFWxkx0PQfj4yEM/ZZ/OActX+FddxnPWspME184z+zOO0L0UpXPhqm1VimaHxDhB6mXaRGVEwkp7BIMDd4qU5kyIU6ZbsFnSlPfwwMv+4f9PM8UMiOatud9QaVWvkkW0H6zGdhDvLfhDEEAU8n6s+S5JBiWLMEyMZTag4OcEb1Y1GbKjLW2cA2sTO59yqKkM+DpXYKFChnosn7OgMoKc2shZxxArDGevTjGC9PHqTSyf2Zw2SLyF8UuvciDoALW/LE3fyNsR4Q/y3GqxWNlnpTbtfXWjfUnnN
+  Adam Graz:
+    user: root
+    type: ssh-rsa
+    key: AAAAB3NzaC1yc2EAAAADAQABAAACAQDQKrovhcCEOjYcP9SIdRbJowsH8GVT4Gh8+fB3ltsNMfeZtAfa6dMTdSfbNQssLeixzo0VS/OGEVLv1eX59kY8+99BDel2A5Y9wGzEb4bKykaEEBeMwE9cpyJc+QUC8RMf/fnA6zp74nrzY3oMXJ8zFyJnY4JsH0TGAZW1ZQwp00PCj7iCfddokSBczmH1f0ipgGW0D+rVdG6Z9hAEHhHuUJE30x8oqaQvC/rFlQeHOhlUbedJe4EmQNoNBXT9LaJbaKKT+tjf+JD73q9uUrTKoeSmL/3UWoxSQYk9P8ZrlRc1Lw4zXPj04+5ka9z2KApZsDx9ZrWGmuYAwiiQmGUz71z+J1uFShiaMIPWLi/pKBFr+pek0NqxjecvgKFeIoOCun9PP1+unyskTJ8+lR9ErXnq4B2jT7GWPUaejmzNdqe2yWqYnkBwGhbRWT2EIczWNMSRwE6kG99WASh+K4qtfS2qBRg2DH6+8zdax5l2U41O+pV+h75+Q0zjpWcy82zP/61ZtDFEF98wHsIG3fOBN9UDHbV/lno0eG7Blx0C4ZsWTsDn4afLXp0Gz7p5lLDXxNHxrpqa/bMnRbFutjcQtPIYlxLKZnxOK1x7l5Q+U93MsC1Lb7QzommKJvSHT4EqDdkpMFrR7zGdDiwbifhTTtIGxKxdSrs+TkhNxnOngQ==
+limits::entries:
+  root/nofile:
+    both: 131072
+      
+pam::options:
+  common-session-pam_limits.so:
+    ensure: present
+    service: common-session
+    type: session
+    control: required
+    module: pam_limits.so
+
+sysctl::entries:
+  net.ipv4.tcp_syncookies:
+    value: 1
+  net.ipv4.ip_default_ttl:
+    value: 59
+  net.ipv4.tcp_timestamps:
+    value: 0
+  net.ipv4.conf.all.rp_filter:
+    value: 2
+  fs.file-max:
+    value: 320000
+  vm.swappiness:
+    value: 0
+  net.ipv6.bindv6only:
+    value: 0
+  net.ipv6.conf.all.disable_ipv6:
+    value: 1
+  net.core.somaxconn:
+    value: 1024
+
+docker::use_upstream_package_source: false
+docker::service_overrides_template: false
+docker::docker_ce_package_name: docker-ce
+docker::repo_opt: ''
+docker::registry_auth::registries:
+  - docker-public.muc.domeus.com
+docker::bip: '10.0.1.1/24'
+
+sudo::purge: true
+sudo::config_file_replace: true
+sudo::configs:
+  nagios:
+    content: 'nagios  ALL=(root) NOPASSWD: /usr/lib/nagios/plugins/check_puppet_agent_last_run.py,/usr/lib/nagios/plugins/check_flink_containers.sh,/usr/lib/nagios/plugins/check_disk'
+    priority: 10
+
+common_apps_settings:
+  hbase:
+    znode: '/hbase'

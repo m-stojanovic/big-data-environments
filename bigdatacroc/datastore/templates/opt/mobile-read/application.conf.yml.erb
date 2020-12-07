@@ -1,0 +1,20 @@
+mobileReadApp {
+  mobileRead {
+    service {
+      enabled = <%= @enabled %>
+      port = <%= @service_port %>
+      protocol = "<%= @protocol %>"
+      scheme = "zk"
+      quorums = ["<%= scope['datastore::api_zookeeper_quorum'] %>","<%= scope['datastore::hd_zookeeper_quorum'] %>"]
+      announcepath = "<%= @announce_path %>"
+      shard = <%= @shard %>
+      announcetimeout = <%= @announce_timeout %>
+    }
+    tablename = "<%= @hbase_table %>"
+    hbaseclient {
+      quorum = "<%= scope['datastore::hd_zookeeper_list'] %>"
+      zkclientport = <%= scope['datastore::hd_zookeeper_clientport'] %>
+      znodeparent = "<%= @hbase_znode %>"
+    }
+  }
+}

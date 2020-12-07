@@ -1,0 +1,120 @@
+---
+zookeeper::ports:
+  hadoop:
+    peerport: '2993'
+    clientport: '2381'
+    leaderport: '3993'
+  api:
+    peerport: '2994'
+    clientport: '2481'
+    leaderport: '3994'
+
+# Zookeeper nodes and id's
+zookeeper::quorumsrv:
+  hadoop:
+    dshdz1105.muc.domeus.com: 0
+    dshdz1106.muc.domeus.com: 1
+    dshdz1107.muc.domeus.com: 2
+  api:
+    dsapz1010.muc.domeus.com: 0
+    dsapz1011.muc.domeus.com: 1
+    dsapz1012.muc.domeus.com: 2
+zookeeper::scheme: zk
+hadoop::journalnodeport: '8485'
+kafka::brokers:
+  dsqueue1020.muc.domeus.com:
+    id: 1
+  dsqueue1021.muc.domeus.com:
+    id: 2
+  dsqueue1022.muc.domeus.com:
+    id: 3
+  dsqueue1023.muc.domeus.com:
+    id: 4
+  dsqueue1024.muc.domeus.com:
+    id: 5
+  dsqueue1025.muc.domeus.com:
+    id: 6
+  dsqueue1026.muc.domeus.com:
+    id: 7
+  dsqueue1027.muc.domeus.com:
+    id: 8
+  dsqueue1028.muc.domeus.com:
+    id: 9
+kafka::broker_port: 9092
+es::clustername: 'EMC-DS-ES'
+es::masternode: 'dsesm1200-es1.muc.domeus.com'
+es::masternode_port: 9200
+es::http_port: 9200
+es::transport_port: 9300
+es::nodes:
+  - dsesd1205-es1.muc.domeus.com
+  - dsesd1205-es2.muc.domeus.com
+  - dsesd1205-es3.muc.domeus.com
+  - dsesd1205-es4.muc.domeus.com
+  - dsesd1206-es1.muc.domeus.com
+  - dsesd1206-es2.muc.domeus.com
+  - dsesd1206-es3.muc.domeus.com
+  - dsesd1206-es4.muc.domeus.com
+  - dsesd1207-es1.muc.domeus.com
+  - dsesd1207-es2.muc.domeus.com
+  - dsesd1207-es3.muc.domeus.com
+  - dsesd1207-es4.muc.domeus.com
+  - dsesd1208-es1.muc.domeus.com
+  - dsesd1208-es2.muc.domeus.com
+  - dsesd1208-es3.muc.domeus.com
+  - dsesd1208-es4.muc.domeus.com
+  - dsesd1209-es1.muc.domeus.com
+  - dsesd1209-es2.muc.domeus.com
+  - dsesd1209-es3.muc.domeus.com
+  - dsesd1209-es4.muc.domeus.com
+  - dsesd1210-es1.muc.domeus.com
+  - dsesd1210-es2.muc.domeus.com  
+  - dsesd1210-es3.muc.domeus.com
+  - dsesd1210-es4.muc.domeus.com
+  - dsesd1211-es1.muc.domeus.com
+  - dsesd1211-es2.muc.domeus.com
+  - dsesd1211-es3.muc.domeus.com
+  - dsesd1211-es4.muc.domeus.com
+  - dsesd1212-es1.muc.domeus.com
+  - dsesd1212-es2.muc.domeus.com  
+  - dsesd1212-es3.muc.domeus.com
+  - dsesd1212-es4.muc.domeus.com
+  - dsesd1213-es1.muc.domeus.com
+  - dsesd1213-es2.muc.domeus.com
+  - dsesd1213-es3.muc.domeus.com
+  - dsesd1213-es4.muc.domeus.com
+
+ha::keepalive: 2
+ha::deadtime: 30
+ha::warntime: 10
+ha::initdead: 35
+ha::udpport: 694
+ha::nodes:
+  - dsapi1005
+  - dsapi1006
+ha::autofailback: 'off'
+ha::preferednode: dsapi1005
+ha::kafkanlbaddress: '172.16.9.189'
+
+confluentapp::kafkarest::package: 'confluent-kafka-rest' 
+confluentapp::kafkarest::version: '2.0.1-1'
+confluentapp::kafkarest::schemaregistryurl: 'http://schema-lb-emc.muc.domeus.com'
+confluentapp::kafkarest::compression_type: 'snappy'
+confluentapp::kafkarest::port: 8182
+confluentapp::kafkarest::consumer_request_max_bytes: 5242880
+confluentapp::kafkarest::debug: 'false'
+confluentapp::kafkarest::javaheapopts: '-Xms4G -Xmx4G'
+confluentapp::kafkarest::jvmperfoptions: '-server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35'
+confluentapp::schemaregistry::packages:
+  confluent-common:
+    ensure: '5.3.1-1'
+  confluent-rest-utils:
+    ensure: '5.3.1-1'
+  confluent-schema-registry:
+    ensure: '5.3.1-1'
+confluentapp::schemaregistry::port: '8181'
+confluentapp::schemaregistry::kafkastoretopic: '_schemas'
+confluentapp::schemaregistry::groupid: 'connect-cluster'
+confluentapp::schemaregistry::url: 'http://localhost:8181'
+confluentapp::schemaregistry::bootstrapservers: 'localhost:9092'
+confluentapp::schemaregistry::hname:

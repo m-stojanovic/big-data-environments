@@ -1,0 +1,16 @@
+---
+profiles::baseprofile::packages:
+  'srvadmin-base':
+    version: '8.4.0'
+    pin: true
+  'srvadmin-omcommon':
+    version: '8.4.0-1'
+    pin: true
+  'srvadmin-storageservices':
+    version: '8.4.0'
+    pin: true
+
+profiles::nrpe::checks:
+  check_openmanage:
+    ensure: present
+    command: /usr/lib/nagios/plugins/custom/check_openmanage -p --check amperage=0

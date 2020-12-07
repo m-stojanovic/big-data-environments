@@ -1,0 +1,115 @@
+forge 'forge.puppetlabs.com'
+
+mod 'abrader/gms', :latest
+mod 'ghoneycutt/common', :latest
+mod 'ghoneycutt/hosts', :latest
+mod 'ghoneycutt/ssh', :latest
+mod 'herculesteam/augeasproviders', :latest
+mod 'herculesteam/augeasproviders_core', :latest
+mod 'herculesteam/augeasproviders_pam',:latest
+mod 'herculesteam/augeasproviders_sysctl', :latest
+mod 'pcfens-filebeat', '4.0.3'
+mod 'pdxcat/nrpe', :latest
+mod 'puppet/alternatives', :latest
+mod 'puppet/archive', :latest
+mod 'puppet/collectd', :latest
+mod 'puppet/make', :latest
+mod 'puppet/nginx', :latest
+mod 'puppet/php', :latest
+mod 'puppet/r10k', :latest
+mod 'puppet/staging', :latest
+mod 'puppetlabs/apache', :latest
+mod 'puppetlabs/apt', :latest
+mod 'puppetlabs/concat', :latest
+mod 'puppetlabs/docker', :latest
+mod 'puppetlabs/firewall', :latest
+mod 'puppetlabs/gcc', :latest
+mod 'puppetlabs/git', :latest
+mod 'puppetlabs/inifile', :latest
+mod 'puppetlabs/mongodb', :latest
+mod 'puppetlabs/mysql', :latest
+mod 'puppetlabs/ntp', :latest
+mod 'puppetlabs/pe_gem', :latest
+mod 'puppetlabs/postgresql', :latest
+mod 'puppetlabs/puppet_agent', :latest
+mod 'puppetlabs/puppetdb', :latest
+mod 'puppetlabs/stdlib', :latest
+mod 'puppetlabs/vcsrepo', :latest
+mod 'razorsedge/snmp', :latest
+mod 'rmueller/cron', :latest
+mod 'saz/limits', :latest
+mod 'saz/sudo', :latest
+mod 'saz/timezone', :latest
+mod 'stm/debconf', :latest
+
+mod 'azkaban',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-azkaban.git',
+  :branch => 'bigdatal3'
+
+mod 'confluentapp',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-confluentapp.git',
+  :branch => 'bigdatal3'
+
+mod 'datastore',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-datastore.git',
+  :branch => 'bigdatal3'
+
+mod 'dockers',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-dockers.git',
+  :branch => 'bigdatal3'
+
+mod 'dsglobals',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-dsglobals.git',
+  :branch => 'bigdatal3'
+
+mod 'es',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-es.git',
+  :branch => 'bigdatal3'
+
+mod 'flink',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-flink.git',
+  :branch => 'bigdatal3'
+
+mod 'ha',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-ha.git',
+  :branch => 'bigdatal3'
+
+mod 'hadoop',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-hadoop.git',
+  :branch => 'bigdatal3'
+
+mod 'hbase',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-hbase.git',
+  :branch => 'bigdatal3'
+
+mod 'java',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-java.git',
+  :branch => 'bigdatal3'
+
+mod 'kafka',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-kafka.git',
+  :branch => 'bigdatal3'
+
+mod 'motd',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-motd.git',
+  :branch => 'bigdatal3'
+
+mod 'profiles',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-profiles.git',
+  :branch => 'bigdatal3'
+
+mod 'puppetmaster',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-puppetmaster.git',
+  :branch => 'bigdatal3'
+
+mod 'reporting',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-reporting.git',
+  :branch => 'bigdatal3'
+
+mod 'roles',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-roles.git',
+  :branch => 'bigdatal3'
+
+mod 'zookeeper',
+  :git => 'git@gitlab01.muc.ecircle.de:puppetmaster_puppet5/bigdata-zookeeper.git',
+  :branch => 'bigdatal3'

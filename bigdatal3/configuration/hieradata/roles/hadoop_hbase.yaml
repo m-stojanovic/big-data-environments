@@ -1,0 +1,93 @@
+---
+lookup_options:
+  hadoop::config::configuration_files:
+    merge: first
+hadoop::data_mounts:
+  - '/DATA'
+  - '/DATA1'
+hadoop::config::configuration_files:
+  base:
+    '/etc/hadoop/conf-puppet/hadoop-metrics.properties': {}
+    '/etc/hadoop/conf-puppet/hadoop-metrics2.properties': {}
+    '/etc/hadoop/conf-puppet/log4j.properties': {}
+    '/etc/hadoop/conf-puppet/hadoop-env.sh': {}
+    '/etc/hadoop/conf-puppet/core-site.xml': {}
+  exec:
+    '/etc/hadoop/conf-puppet/topology.py':
+      mode: '0755'
+  hdfs:
+    '/etc/hadoop/conf-puppet/hdfs-site.xml': {}
+    '/etc/hadoop/conf-puppet/masters': {}
+    '/etc/hadoop/conf-puppet/slaves': {}
+hadoop::master_cluster_dfs: 'dsl31hbase'
+hadoop::config::master_namenode1: 'dshdm020.muc.domeus.com'
+hadoop::config::master_namenode1_alias: 'dsl31hbnn1'
+hadoop::config::master_namenode2: 'dshdm021.muc.domeus.com'
+hadoop::config::master_namenode2_alias: 'dsl31hbnn2'
+hadoop::config::namenode_heap_mb: '16384'
+hadoop::config::topology:
+  - '10.128.241.30,/rack0'
+  - '10.128.241.31,/rack0'
+  - '10.128.241.32,/rack0'
+  - '10.128.241.33,/rack0'
+  - '10.128.241.34,/rack0'
+  - '10.128.241.35,/rack0'
+  - '10.128.241.36,/rack1'
+  - '10.128.241.37,/rack1'
+  - '10.128.241.38,/rack1'
+  - '10.128.241.39,/rack1'
+  - '10.128.241.40,/rack1'
+  - '10.128.241.41,/rack1'
+  - '10.128.241.42,/rack0'
+  - '10.128.241.43,/rack0'
+  - '10.128.241.44,/rack0'
+  - '10.128.241.45,/rack0'
+  - '10.128.241.46,/rack0'
+  - '10.128.241.47,/rack0'
+  - '10.128.241.48,/rack1'
+  - '10.128.241.49,/rack1'
+  - '10.128.241.50,/rack1'
+  - '10.128.241.51,/rack1'
+  - '10.128.241.52,/rack1'
+  - '10.128.241.53,/rack1'
+  - '10.128.241.54,/rack0'
+  - '10.128.241.55,/rack0'
+  - '10.128.241.56,/rack0'
+  - '10.128.241.57,/rack0'
+  - '10.128.241.58,/rack0'
+  - '10.128.241.59,/rack0'
+  - '10.128.241.60,/rack1'
+  - '10.128.241.61,/rack1'
+  - '10.128.241.62,/rack1'
+  - '10.128.241.63,/rack1'
+  - '10.128.241.64,/rack1'
+  - '10.128.241.65,/rack1'
+hadoop::config::dfs_datanode_failed_volumes_tolerated: 1
+
+# those values should be removed but are required by module and I don't want to play with it right now
+hadoop::master_cluster_mr: 'TBR'
+hadoop::config::mapreduce_map_java_opts: 'TBR'
+hadoop::config::mapreduce_map_memory_mb: 'TBR'
+hadoop::config::mapreduce_reduce_java_opts: 'TBR'
+hadoop::config::mapreduce_reduce_memory_mb: 'TBR'
+hadoop::config::master_historyserver: 'TBR'
+hadoop::config::master_jobtracker1: 'TBR'
+hadoop::config::master_jobtracker1_alias: 'TBR'
+hadoop::config::master_jobtracker2: 'TBR'
+hadoop::config::master_jobtracker2_alias: 'TBR'
+hadoop::config::master_resourcemanager: 'TBR'
+hadoop::config::yarn_app_mapreduce_am_resource_mb: 'TBR'
+hadoop::config::yarn_app_mapreduce_am_staging_dir: 'TBR'
+hadoop::config::yarn_log_aggregation_enable: 'TBR'
+hadoop::config::yarn_nodemanager_remote_app_log_dir: 'TBR'
+hadoop::config::yarn_nodemanager_resource_cpu_vcores: 'TBR'
+hadoop::config::yarn_nodemanager_resource_memory_mb: 'TBR'
+hadoop::config::yarn_resourcemanager_zk_state_store_parent_path: 'TBR'
+hadoop::config::yarn_scheduler_capacity_maximum_applications: 'TBR'
+hadoop::config::yarn_scheduler_capacity_root_queues: 'TBR'
+hadoop::config::yarn_scheduler_maximum_allocation_mb: 'TBR'
+hadoop::config::yarn_scheduler_maximum_allocation_vcores: 'TBR'
+hadoop::config::yarn_scheduler_capacity_queues_settings: 'TBR'
+
+hbase::config::master_cluster_dfs: 'dsl31hbase'
+hbase::config::zookeeper_znode_parent: '/hbase-ssd'

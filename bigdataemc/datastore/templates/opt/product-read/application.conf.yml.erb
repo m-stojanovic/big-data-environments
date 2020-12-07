@@ -1,0 +1,32 @@
+productReadApp {
+  productread {
+    service {
+      enabled = <%= @enabled %>
+      port = <%= @service_port %>
+      protocol = "<%= @protocol %>"
+      scheme = "zk"
+      quorums = ["<%= scope['datastore::api_zookeeper_quorum'] %>","<%= scope['datastore::hd_zookeeper_quorum'] %>"]
+      announcepath = "<%= @announce_path %>"
+      shard = <%= @shard %>
+      announcetimeout = <%= @announce_timeout %>
+    }
+    producttable = "<%= @hbase_product_table %>"
+    wishlisttable = "<%= @hbase_wishlist_table %>"
+    hbaseclient {
+      quorum = "<%= scope['datastore::hd_zookeeper_list'] %>"
+      zkclientport = <%= scope['datastore::hd_zookeeper_clientport'] %>
+      znodeparent = "<%= @hbase_znode %>"
+    }
+  }
+  announcer {
+    enabled = true
+    interval = 900
+    destination = "zk!<%= scope['datastore::hd_zookeeper_quorum'] %>!/services/registry"
+  }
+  logging {
+    log_to_file = true
+    log_to_console = false
+    log_path = "logs/"
+    default_log_level = "<%= @log_level %>"
+  }
+}

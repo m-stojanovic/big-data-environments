@@ -1,0 +1,5 @@
+---
+# flink packages
+flink::packages:
+  flink:
+    ensure: '1.9.1-1'

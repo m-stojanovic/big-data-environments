@@ -1,0 +1,281 @@
+---
+nginx::worker_processes: 4
+nginx::nginx_servers:
+  'proxy-emc-dashboard.deproxy.muc.domeus.com':
+    www_root: '/var/www/'
+    use_default_location: false
+    listen_port: 80
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+    index_files:
+      - 'index.html'
+      - 'index.htm'
+    client_max_body_size: '200M'
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-azkaban.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+    client_max_body_size: '300M'
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-bigbrother.deproxy.muc.domeus.com':
+    listen_port: 80
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-es.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-etl.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-dev.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-hbase.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-hbase-nn.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-hdfs.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-presto.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-storm.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-kafka.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-monitor.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-stream.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-yarn.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'proxy-emc-yarnhistory.deproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+nginx::nginx_upstreams:
+  'cerebro':
+    ensure: present
+    members:
+      'dshdc1100.muc.domeus.com:8080':
+        server: 'dshdc1100.muc.domeus.com'
+        port: 8080
+        fail_timeout: '0s'
+  'etlserver':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi1006.muc.domeus.com:8079':
+        server: 'dsapi1006.muc.domeus.com'
+        port: 8079
+        backup: true
+      'dsapi1007.muc.domeus.com:8079':
+        server: 'dsapi1007.muc.domeus.com'
+        port: 8079
+  'etldev':
+    ensure: present
+    least_conn: true
+    members:
+      'dshdc1100.muc.domeus.com:8079':
+        server: 'dshdc1100.muc.domeus.com'
+        port: 8079
+  'elasticsearch':
+    ensure: present
+    members:
+      'dsesm1200-es1.muc.domeus.com:9200':
+        server: 'dsesm1200-es1.muc.domeus.com'
+        port: 9200
+      'dsesm1201-es1.muc.domeus.com:9200':
+        server: 'dsesm1201-es1.muc.domeus.com'
+        port: 9200
+        backup: true
+  'drill':
+    ensure: present
+    members:
+      'dshdm1101.muc.domeus.com:8047':
+        server: 'dshdm1101.muc.domeus.com'
+        port: 8047
+      'dshdm1102.muc.domeus.com:8047':
+        server: 'dshdm1102.muc.domeus.com'
+        backup: true
+      'dshdp1110.muc.domeus.com:8047':
+        server: 'dshdp1110.muc.domeus.com'
+        backup: true
+  'support':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi1002.muc.domeus.com:8079':
+        server: 'dsapi1002.muc.domeus.com'
+        port: 8079
+      'dsapi1003.muc.domeus.com:8079':
+        server: 'dsapi1003.muc.domeus.com'
+        port: 8079
+        backup: true
+nginx::nginx_locations:
+  'parquet':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '/parquet/'
+    proxy_set_header: 
+      - 'X-Real-IP $remote_addr'
+      - 'Host $http_host'
+      - 'Connection ""'
+    proxy_http_version: '1.1'
+    proxy: 'http://dshdc1100:9001/'
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+  'datareport':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '/datareport'
+    autoindex: 'on'
+  'dashboard':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    www_root: '/var/www/'
+    index_files:
+      - 'index.html'
+      - 'index.htm'
+    location_custom_cfg:
+      error_page: '405 =200 $uri'
+  'elastic':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '/elastic'
+    proxy: 'http://elasticsearch/'
+  'burrow':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '/burrow'
+    proxy: 'http://dshdc1100.muc.domeus.com:8000/'
+  'node':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '/node'
+    proxy: 'http://dshdp1135.muc.domeus.com:8042/'
+  '~ \.php$':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: '~ \.php$'
+    include:
+      - 'snippets/fastcgi-php.conf'
+    fastcgi: 'unix:/run/php5-fpm.sock'
+  'drill':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location: 'drill'
+    proxy_set_header: 
+      - 'X-Real-IP $remote_addr'
+      - 'Host $http_host'
+      - 'Connection ""'
+    proxy_http_version: '1.1'
+    location_custom_cfg:
+      proxy_pass: 'http://dshdm1101.muc.domeus.com:8047/'
+  '~ /\.ht':
+    server: 'proxy-emc-dashboard.deproxy.muc.domeus.com'
+    location_custom_cfg:
+      deny: 'all'
+  'azkaban':
+    location: '/'
+    server: 'proxy-emc-azkaban.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm1102.muc.domeus.com/'
+    proxy_redirect: 'http://dshdm1102.muc.domeus.com http://dshdm1102.muc.domeus.com/'
+  'es':
+    location: '/'
+    server: 'proxy-emc-es.deproxy.muc.domeus.com'
+    proxy: 'http://cerebro/'
+  'etl':
+    location: '/'
+    server: 'proxy-emc-etl.deproxy.muc.domeus.com'
+    proxy: 'http://etlserver/'
+    proxy_redirect: 'http://dsapi1007.muc.domeus.com http://etlserver/'
+  'etldev':
+    location: '/'
+    server: 'proxy-emc-dev.deproxy.muc.domeus.com'
+    proxy: 'http://etldev/'
+    proxy_redirect: 'http://dsapi1007.muc.domeus.com http://etldev/'
+  'hbase':
+    location: '/'
+    server: 'proxy-emc-hbase.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm120.muc.domeus.com:60010/'
+  'hbase-nn':
+    location: '/'
+    server: 'proxy-emc-hbase-nn.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm121.muc.domeus.com:50070/'
+    proxy_redirect: 'http://dsapi1007.muc.domeus.com http://dshdm121.muc.domeus.com:50070/'
+  'hdfs':
+    location: '/'
+    server: 'proxy-emc-hdfs.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm1101.muc.domeus.com:50070/'
+  'kafka':
+    location: '/'
+    server: 'proxy-emc-kafka.deproxy.muc.domeus.com'
+    proxy: 'http://dshdc1100.muc.domeus.com:9000/'
+  'monitor':
+    location: '/'
+    server: 'proxy-emc-monitor.deproxy.muc.domeus.com'
+    proxy: 'http://support/'
+    proxy_redirect: 'http://dsapi1002.muc.domeus.com http://support/'
+  'streams':
+    location: '/'
+    server: 'proxy-emc-stream.deproxy.muc.domeus.com'
+    proxy: 'http://dsstreamm1040.muc.domeus.com:50060/'
+    proxy_redirect: 'http://dsapi1007.muc.domeus.com http://dsstreamm1040.muc.domeus.com:50060/'
+  'yarn':
+    location: '/'
+    server: 'proxy-emc-yarn.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm1102.muc.domeus.com:50060/'
+    proxy_redirect: 'http://dsapi1007.muc.domeus.com http://dshdm1102.muc.domeus.com:50060/'
+  'yarnhistory':
+    location: '/'
+    server: 'proxy-emc-yarnhistory.deproxy.muc.domeus.com'
+    proxy: 'http://dshdm1101.muc.domeus.com:19888/'
+  'storm':
+    server: 'proxy-emc-storm.deproxy.muc.domeus.com'
+    location: '/'
+    proxy: 'http://dshdc1100.muc.domeus.com:9090/'
+    proxy_set_header: 
+      - 'X-Real-IP $remote_addr'
+      - 'Host $http_host'
+      - 'Connection ""'
+    proxy_http_version: '1.1'
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+  'hue':
+    server: 'proxy-emc-presto.deproxy.muc.domeus.com'
+    location: '/'
+    proxy: 'http://dshdc1100.muc.domeus.com:8888/'

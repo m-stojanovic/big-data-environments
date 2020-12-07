@@ -1,0 +1,7 @@
+---
+apt::sources:
+  "debian_jessie_cloudera_cdh5_14_0":
+    location: http://mp13install01.infsvc.cloud4.local/apt/archive.cloudera.com/cdh5/debian/jessie/amd64/cdh
+    release: jessie-cdh5.14.0
+    repos: contrib
+    allow_unsigned: true

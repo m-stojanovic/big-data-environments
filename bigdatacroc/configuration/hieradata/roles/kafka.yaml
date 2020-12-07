@@ -1,0 +1,12 @@
+---
+# Common kafka limits
+limits::entries:
+  'kafka/nofile':
+    both: 131072
+  'kafka/nproc':
+    both: 32000
+
+profiles::nrpe::checks:
+  check_apache_kafka:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -u kafka -c 1:1 -C java -a kafka

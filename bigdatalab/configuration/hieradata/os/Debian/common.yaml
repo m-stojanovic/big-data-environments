@@ -1,0 +1,46 @@
+---
+apt::sources:
+  "debian_%{facts.os.distro.codename}":
+    location: http://image-priv.muc.domeus.com/apt/debian
+    release: "%{facts.os.distro.codename}"
+    repos: main contrib non-free
+  "debian_%{facts.os.distro.codename}_security":
+    location: http://image-priv.muc.domeus.com/apt/security
+    release: "%{facts.os.distro.codename}/updates"
+    repos: main contrib non-free
+  "debian_%{facts.os.distro.codename}_docker":
+    location: http://image-priv.muc.domeus.com/apt/docker/debian
+    release: "%{facts.os.distro.codename}"
+    repos: stable
+  "debian_%{facts.os.distro.codename}_puppetlabs":
+    location: http://image-priv.muc.domeus.com/apt/apt.puppetlabs.com
+    release: "%{facts.os.distro.codename}"
+    repos: puppet6
+    key:
+      id: 6F6B15509CF8E59E6E469F327F438280EF8D349F
+      source: http://image-priv.muc.domeus.com/apt/repo-keys/apt.puppetlabs.com.gpg
+  "debian_%{facts.os.distro.codename}_mapp":
+    location: http://image-priv.muc.domeus.com/apt/dsdebrepo/
+    architecture: amd64,all
+    release: mapp
+    repos: main
+    key:
+      id: 992E4D14E3BC7F71A59AF48AA40EAA8781EDE7B0
+      source: http://image-priv.muc.domeus.com/apt/repo-keys/dsdebrepo.gpg.key
+
+profiles::baseprofile::packages:
+  debian-keyring:
+    version: installed
+    pin: false
+  debian-archive-keyring:
+    version: installed
+    pin: false
+cron::job:
+  'hugepages':
+    command: 'echo "never" > /sys/kernel/mm/transparent_hugepage/defrag'
+    special: 'reboot'
+    user: root
+    environment:
+      - 'MAILTO=root'
+      - 'PATH="/usr/bin:/bin"'
+    description: 'Transparent hugepages never'

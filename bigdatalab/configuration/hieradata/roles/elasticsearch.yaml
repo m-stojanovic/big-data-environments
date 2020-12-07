@@ -1,0 +1,52 @@
+---
+profiles::nrpe::checks:
+  check_es_docker:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 4:4 -C java -a Elasticsearch
+  check_es:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a Elasticsearch
+  check_procinfo:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procinfo.sh
+
+es::es_config_dir: /opt/etc
+es::es_limits_dir: /opt/limits.d
+es::es_init_dir: /opt/init.d
+es::es_usr_dir: /opt/usr
+es::es_data_dir: es-data
+es::cluster_name: DEV-DS-ES
+es::heap_size_emb: 512m
+es::disk_type: ssd
+es::number_of_shards: 5
+es::number_of_replicas: '0'
+es::index_refresh_interval: 5s
+es::index_buffer_size: 15%
+es::flush_threshold: 20000
+es::minimum_master_nodes: 1
+es::recover_after_nodes: 10
+es::expected_nodes: 10
+es::elasticsearch_user: elasticsearch
+es::elasticsearch_group: elasticsearch
+es::homedir: /usr/share/elasticsearch
+es::environment: dev
+es::unicast_hosts: [ '10.128.251.73:9300' ]
+es::http_max_content_length: 500mb
+es::processors: 2
+es::es_open_files: 131072
+es::es_fs_user: root
+es::es_fs_group: root
+es::data_path: '/DATA1/es-data,/DATA2/es-data,/DATA3/es-data,/DATA4/es-data'
+es::logs_path: '/DATA1/elasticsearch'
+es::docker::p502:
+    p502-es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:201805021542'
+      d_volumes: [ '/DATA1:/DATA1','/DATA2:/DATA2','/DATA3:/DATA3','/DATA4:/DATA4' ]
+      d_ipaddr: "%{facts.networking.interfaces.eth0.ip}"
+      d_ports: ['9200:9200','9300:9300']
+      d_expose: ['9200','9300']
+      d_subnet: '10.128.244.0/24'
+      d_gateway: '10.128.244.1'
+      is_master: true
+      is_node: true
+      auto_create_index: false

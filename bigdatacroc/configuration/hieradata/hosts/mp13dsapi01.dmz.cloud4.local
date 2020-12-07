@@ -1,0 +1,21 @@
+profiles::firewall::rules::ipv4:
+  '800 Allow Kafka hearthbeat':
+    chain: INPUT
+    proto: udp
+    dport: 694
+    action: 'accept'
+  '801 allow 8182 - kafka rest proxy':
+    chain: INPUT
+    proto: tcp
+    dport: 8182
+    action: accept
+  '802 allow 8181 - schema registry':
+    chain: INPUT
+    proto: tcp
+    dport: 8181
+    action: accept
+  '803 allow port 80 - for DMC access via proxy':
+    chain: INPUT
+    proto: tcp
+    dport: 80
+    action: accept  

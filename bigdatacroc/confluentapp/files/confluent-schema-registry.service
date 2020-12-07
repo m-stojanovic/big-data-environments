@@ -1,0 +1,17 @@
+[Unit]
+Description=Schema Registry service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/schema-registry-start /etc/schema-registry/schema-registry.properties
+TimeoutStopSec=180
+Restart=no
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=confluent-schema-registry
+
+[Install]
+WantedBy=multi-user.target

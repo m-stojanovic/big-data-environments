@@ -1,0 +1,111 @@
+---
+lookup_options:
+  hadoop::config::configuration_files:
+    merge: first
+hadoop::data_mounts:
+  - '/DATA'
+  - '/DATA1'
+hadoop::config::configuration_files:
+  base:
+    '/etc/hadoop/conf-puppet/hadoop-metrics.properties': {}
+    '/etc/hadoop/conf-puppet/hadoop-metrics2.properties': {}
+    '/etc/hadoop/conf-puppet/log4j.properties': {}
+    '/etc/hadoop/conf-puppet/hadoop-env.sh': {}
+    '/etc/hadoop/conf-puppet/core-site.xml': {}
+  exec:
+    '/etc/hadoop/conf-puppet/topology.py':
+      mode: '0755'
+  hdfs:
+    '/etc/hadoop/conf-puppet/hdfs-site.xml': {}
+    '/etc/hadoop/conf-puppet/masters': {}
+    '/etc/hadoop/conf-puppet/slaves': {}
+hadoop::master_cluster_dfs: 'dsemc1hbase'
+hadoop::config::master_namenode1: 'dshdm120.muc.domeus.com'
+hadoop::config::master_namenode1_alias: 'dsemc1hbnn1'
+hadoop::config::master_namenode2: 'dshdm121.muc.domeus.com'
+hadoop::config::master_namenode2_alias: 'dsemc1hbnn2'
+hadoop::config::namenode_heap_mb: '16384'
+hadoop::config::topology:
+  - '10.128.245.30,/rack0'
+  - '10.128.245.31,/rack0'
+  - '10.128.245.32,/rack0'
+  - '10.128.245.33,/rack0'
+  - '10.128.245.34,/rack0'
+  - '10.128.245.35,/rack0'
+  - '10.128.245.36,/rack1'
+  - '10.128.245.37,/rack1'
+  - '10.128.245.38,/rack1'
+  - '10.128.245.39,/rack1'
+  - '10.128.245.40,/rack1'
+  - '10.128.245.41,/rack1'
+  - '10.128.245.42,/rack0'
+  - '10.128.245.43,/rack0'
+  - '10.128.245.44,/rack0'
+  - '10.128.245.45,/rack0'
+  - '10.128.245.46,/rack0'
+  - '10.128.245.47,/rack0'
+  - '10.128.245.48,/rack1'
+  - '10.128.245.49,/rack1'
+  - '10.128.245.50,/rack1'
+  - '10.128.245.51,/rack1'
+  - '10.128.245.52,/rack1'
+  - '10.128.245.53,/rack1'
+  - '10.128.245.54,/rack0'
+  - '10.128.245.55,/rack0'
+  - '10.128.245.56,/rack0'
+  - '10.128.245.57,/rack0'
+  - '10.128.245.58,/rack0'
+  - '10.128.245.59,/rack0'
+  - '10.128.245.60,/rack1'
+  - '10.128.245.61,/rack1'
+  - '10.128.245.62,/rack1'
+  - '10.128.245.63,/rack1'
+  - '10.128.245.64,/rack1'
+  - '10.128.245.65,/rack1'
+  - '10.128.245.66,/rack0'
+  - '10.128.245.67,/rack0'
+  - '10.128.245.68,/rack0'
+  - '10.128.245.69,/rack0'
+  - '10.128.245.70,/rack0'
+  - '10.128.245.71,/rack0'
+  - '10.128.245.72,/rack1'
+  - '10.128.245.73,/rack1'
+  - '10.128.245.74,/rack1'
+  - '10.128.245.75,/rack1'
+  - '10.128.245.76,/rack1'
+  - '10.128.245.77,/rack1'
+  - '10.128.245.78,/rack0'
+  - '10.128.245.79,/rack0'
+  - '10.128.245.80,/rack0'
+  - '10.128.245.81,/rack1'
+  - '10.128.245.82,/rack1'
+  - '10.128.245.83,/rack1'
+hadoop::config::dfs_datanode_failed_volumes_tolerated: 0
+
+# those values should be removed but are required by module and I don't want to play with it right now
+hadoop::master_cluster_mr: 'TBR'
+hadoop::config::mapreduce_map_java_opts: 'TBR'
+hadoop::config::mapreduce_map_memory_mb: 'TBR'
+hadoop::config::mapreduce_reduce_java_opts: 'TBR'
+hadoop::config::mapreduce_reduce_memory_mb: 'TBR'
+hadoop::config::master_historyserver: 'TBR'
+hadoop::config::master_jobtracker1: 'TBR'
+hadoop::config::master_jobtracker1_alias: 'TBR'
+hadoop::config::master_jobtracker2: 'TBR'
+hadoop::config::master_jobtracker2_alias: 'TBR'
+hadoop::config::master_resourcemanager: 'TBR'
+hadoop::config::yarn_app_mapreduce_am_resource_mb: 'TBR'
+hadoop::config::yarn_app_mapreduce_am_staging_dir: 'TBR'
+hadoop::config::yarn_log_aggregation_enable: 'TBR'
+hadoop::config::yarn_nodemanager_remote_app_log_dir: 'TBR'
+hadoop::config::yarn_nodemanager_resource_cpu_vcores: 'TBR'
+hadoop::config::yarn_nodemanager_resource_memory_mb: 'TBR'
+hadoop::config::yarn_resourcemanager_zk_state_store_parent_path: 'TBR'
+hadoop::config::yarn_scheduler_capacity_maximum_applications: 'TBR'
+hadoop::config::yarn_scheduler_capacity_root_queues: 'TBR'
+hadoop::config::yarn_scheduler_maximum_allocation_mb: 'TBR'
+hadoop::config::yarn_scheduler_maximum_allocation_vcores: 'TBR'
+hadoop::config::yarn_scheduler_capacity_queues_settings: 'TBR'
+
+hbase::config::master_cluster_dfs: 'dsemc1hbase'
+hbase::config::zookeeper_znode_parent: '/hbase-ssd'

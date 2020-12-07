@@ -1,0 +1,4 @@
+[Service]
+Environment="ADMIN_OPTS=-admin.port=:<%= @admin_port %>"
+Environment="JAVA_OPTS=-Xms<%= @java_xms %> -Xmx<%= @java_xmx %> -Djava.net.preferIPv4Stack=true -Dlogback.configurationFile=/opt/selection-engine-application/logback.xml"
+LimitNOFILE=<%= @limit_nofile %>

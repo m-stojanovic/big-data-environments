@@ -1,0 +1,5 @@
+---
+# Custom hadoop parameteres for streaming cluster slave node
+hadoop::config::yarn_nodemanager_resource_memory_mb: '49152'
+hadoop::config::yarn_scheduler_maximum_allocation_mb: '49152'
+hadoop::config::yarn_scheduler_maximum_allocation_vcores: '320'

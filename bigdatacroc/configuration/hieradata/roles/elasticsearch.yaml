@@ -1,0 +1,107 @@
+---
+profiles::nrpe::checks:
+  check_es_docker:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 1:1 -C java -a Elasticsearch
+  check_es:
+    ensure: present
+    command: /usr/lib/nagios/plugins/check_procs -c 2:2 -C java -a Elasticsearch
+  check_disks:
+    ensure: present
+    command: /usr/bin/sudo /usr/lib/nagios/plugins/check_disk -e -l -w 13% -c 8% -W 13% -K 8% -r / -I /var/lib/docker/ -I /run/docker
+
+es::es_data_dir: es-data
+es::config::disk_type: ssd
+es::config::allocation_balance_shard: 0.25
+es::config::discovery_zen_ping_timeout: 30s
+es::cluster_name: DS-CROC-ES
+es::unicast_hosts: ['mp13dsesm01:9300','mp13dsesm02:9300','mp13dsesd01:9300','mp13dsesd02:9300','mp13dsesd03:9300','mp13dsesd04:9300']
+es::data_path: '/DATA/es-data'
+es::logs_path: '/DATA/elasticsearch'
+es::network_mode: host
+es::common_settings:
+  script.painless.regex.enabled: true
+es::docker::mp13dsesm01:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA' ]
+      d_ipaddr: '10.168.196.140'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 4g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::mp13dsesm02:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA' ]
+      d_ipaddr: '10.168.196.141'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 4g
+      is_master: true
+      is_node: false
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::mp13dsesd01:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA']
+      d_ipaddr: '10.168.196.120'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 8g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::mp13dsesd02:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA']
+      d_ipaddr: '10.168.196.121'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 8g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::mp13dsesd03:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA']
+      d_ipaddr: '10.168.196.122'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 8g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"
+es::docker::mp13dsesd04:
+    es1:
+      d_image: 'docker-public.muc.domeus.com/devops/ds-es-node-v6:7.2.0-201907211448'
+      d_volumes: [ '/DATA:/DATA']
+      d_ipaddr: '10.168.196.123'
+      d_path: '/DATA/es-data'
+      d_gateway: '10.168.196.1'
+      heapsizemb: 8g
+      is_master: false
+      is_node: true
+      auto_create_index: '".watches,.triggered_watches,.watcher-history-*,rd_*"'
+      disk_type: "%{alias('es::config::disk_type')}"
+      allocation_balance_shard: "%{alias('es::config::allocation_balance_shard')}"
+      discovery_zen_ping_timeout: "%{alias('es::config::discovery_zen_ping_timeout')}"

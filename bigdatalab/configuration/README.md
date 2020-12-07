@@ -1,0 +1,1 @@
+Configuration repository for Puppet 5 - hdplab.

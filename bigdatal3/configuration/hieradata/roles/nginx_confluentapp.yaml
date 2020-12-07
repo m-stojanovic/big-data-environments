@@ -1,0 +1,168 @@
+---
+nginx::nginx_servers:  
+  'kafka-lb-l3.muc.domeus.com':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'schema-lb-l3.muc.domeus.com':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'pe-services.g.shortest-route.com':
+    listen_port: 8443
+    ssl_port: 8443
+    ssl: true
+    ssl_dhparam: '/etc/ssl/private/dhparams.pem'
+    ssl_key: '/etc/ssl/private/pe-services.g.shortest-route.com.key'
+    ssl_cert: '/etc/ssl/private/pe-services.g.shortest-route.com.pem'
+    ssl_prefer_server_ciphers: 'on'
+    ssl_ciphers: 'AES256+EECDH:AES256+EDH:!EXPORT'
+    ssl_protocols: 'TLSv1.2'
+    use_default_location: false
+    add_header:
+      'X-Frame-Options': 'SAMEORIGIN'
+  'pe-services-wt.g.shortest-route.com':
+    listen_port: 8443
+    ssl_port: 8443
+    ssl: true
+    ssl_dhparam: '/etc/ssl/private/dhparams.pem'
+    ssl_key: '/etc/ssl/private/pe-services-wt.key'
+    ssl_cert: '/etc/ssl/private/pe-services-wt.pem'
+    ssl_client_cert: '/etc/ssl/private/internalca-full-chain.pem'
+    ssl_verify_client: 'on'
+    ssl_verify_depth: 3
+    ssl_cache: 'shared:SSL:10m'
+    ssl_session_timeout: '5m'
+    ssl_prefer_server_ciphers: 'on'
+    ssl_ciphers: 'AES256+EECDH:AES256+EDH:!EXPORT'
+    ssl_protocols: 'TLSv1.2'
+    use_default_location: false
+    add_header: 
+      'X-Frame-Options': 'SAMEORIGIN'
+nginx::nginx_upstreams:
+  'dsapil3':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi185.muc.domeus.com:8182':
+        server: 'dsapi185.muc.domeus.com'
+        port: 8182
+      'dsapi186.muc.domeus.com:8182':
+        server: 'dsapi186.muc.domeus.com'
+        port: 8182
+        backup: true
+  'schemal3':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi183.muc.domeus.com:8181':
+        server: 'dsapi183.muc.domeus.com'
+        port: 8181
+      'dsapi184.muc.domeus.com:8181':
+        server: 'dsapi184.muc.domeus.com'
+        port: 8181
+        backup: true
+  'consull3':
+    ensure: present
+    least_conn: true
+    members:
+      'gp13consul01.muc.domeus.com:8500':
+        server: 'gp13consul01.muc.domeus.com'
+        port: 8500
+      'gp13consul02.muc.domeus.com:8500':
+        server: 'gp13consul02.muc.domeus.com'
+        port: 8500
+      'gp13consul03.muc.domeus.com:8500':
+        server: 'gp13consul03.muc.domeus.com'
+        port: 8500
+  'statsl3':
+    ensure: present
+    least_conn: true
+    members:
+      'dsapi181.muc.domeus.com:8889':
+        server: 'dsapi181.muc.domeus.com'
+        port: 8889
+      'dsapi182.muc.domeus.com:8889':
+        server: 'dsapi182.muc.domeus.com'
+        port: 8889
+      'dsapi183.muc.domeus.com:8889':
+        server: 'dsapi183.muc.domeus.com'
+        port: 8889
+      'dsapi184.muc.domeus.com:8889':
+        server: 'dsapi184.muc.domeus.com'
+        port: 8889
+      'dsapi185.muc.domeus.com:8889':
+        server: 'dsapi185.muc.domeus.com'
+        port: 8889
+      'dsapi186.muc.domeus.com:8889':
+        server: 'dsapi186.muc.domeus.com'
+        port: 8889
+nginx::nginx_locations:
+  'kafka_lb':
+    location: '/'
+    server: 'kafka-lb-l3.muc.domeus.com'
+    proxy: 'http://dsapil3/$1'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'
+    proxy_set_header: 
+      - 'Host $http_host'
+      - 'X-Public-IP 195.140.186.31'
+  'schema':
+    location: '/'
+    server: 'schema-lb-l3.muc.domeus.com'
+    proxy: 'http://schemal3/$1'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'
+    proxy_set_header: 
+      - 'Host $http_host'
+  'kafkarest':
+    server: 'pe-services.g.shortest-route.com'
+    location: '/kafkarest/'
+    proxy: 'http://dsapil3'
+    rewrite_rules: 
+      - '^/kafkarest(/.*)$ $1 break'
+    ssl: true
+    ssl_only: true
+    proxy_set_header: 
+      - 'Host $host'
+      - 'X-Real-IP $remote_addr'
+      - 'X-Forwarded-For $proxy_add_x_forwarded_for'
+      - 'X-Forwarded-Proto https'
+  'consul':
+    server: 'pe-services.g.shortest-route.com'
+    location: '/consul/'
+    proxy: 'http://consull3'
+    rewrite_rules: 
+      - '^/consul(/.*)$ $1 break'
+    ssl: true
+    ssl_only: true
+    proxy_set_header: 
+      - 'Host $host'
+      - 'X-Real-IP $remote_addr'
+      - 'X-Forwarded-For $proxy_add_x_forwarded_for'
+      - 'X-Forwarded-Proto https'
+  'wtapi':
+    server: 'pe-services-wt.g.shortest-route.com'
+    location: '/wtapi/'
+    proxy: 'http://statsl3'
+    proxy_read_timeout: '900s'
+    proxy_connect_timeout: '900s'
+    proxy_send_timeout: '900s'
+    ssl: true
+    ssl_only: true
+    proxy_set_header: 
+      - 'Host $host'
+      - 'X-Real-IP $remote_addr'
+      - 'X-Forwarded-For $proxy_add_x_forwarded_for'
+      - 'X-Forwarded-Proto https'
+    raw_prepend: 
+      - 'if ( $ssl_client_s_dn = "/C=DE/ST=Berlin/L=Berlin/O=Webtrekk GmbH/OU=API/CN=Webtrekk API" ) { rewrite ^/wtapi(/.*)$ /api-script/$1 break; }'
+      - 'if ( $ssl_client_s_dn != "/C=DE/ST=Berlin/L=Berlin/O=Webtrekk GmbH/OU=API/CN=Webtrekk API" ) { return 403; }'

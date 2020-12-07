@@ -1,0 +1,221 @@
+nginx::package: 'nginx-full'
+nginx::package_ensure: '1.6.2-5+deb8u6'
+nginx::manage_repo: false
+nginx::sendfile: 'on'
+nginx::http_tcp_nodelay: 'on'
+nginx::http_tcp_nopush: 'on'
+nginx::types_hash_max_size: '2048'
+nginx::worker_processes: 4
+nginx::worker_rlimit_nofile: 1024
+nginx::nginx_servers:
+  'proxy-croc-dashboard.ruproxy.muc.domeus.com':
+    www_root: '/var/www/'
+    use_default_location: false
+    listen_port: 80
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+    index_files:
+      - 'index.html'
+      - 'index.htm'
+    client_max_body_size: '200M'
+  'proxy-croc-azkaban.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+    client_max_body_size: '300M'
+  'proxy-croc-dmc-azkaban.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+    proxy_read_timeout: '1000'
+    proxy_send_timeout: '1000'
+    proxy_connect_timeout: '1000'
+    client_max_body_size: '300M'
+  'proxy-croc-es.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-etl.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-hbase.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-hdfs.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-presto.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-kafka.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-stream.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-yarn.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'proxy-croc-yarnhistory.ruproxy.muc.domeus.com':
+    listen_port: 80
+    use_default_location: false
+  'kafka-lb-croc.dmz.cloud4.local':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    proxy_set_header: 
+      - 'Host $http_host'
+  'schema-lb-croc.dmz.cloud4.local':
+    listen_port: 80
+    www_root: '/var/www/html'
+    index_files:
+      - 'index.html'
+    use_default_location: false
+    proxy_set_header: 
+      - 'Host $http_host'
+nginx::nginx_upstreams:
+  'cerebro':
+    ensure: present
+    members:
+      'mp13dsesm02.cloud.cloud4.local:9000':
+        server: 'mp13dsesm02.cloud.cloud4.local'
+        port: 9000
+        fail_timeout: '0s'
+  'etlserver':
+    ensure: present
+    least_conn: true
+    members:
+      'mp13dsapi01.dmz.cloud4.local:8079':
+        server: 'mp13dsapi01.dmz.cloud4.local'
+        port: 8079
+      'mp13dsapi02.dmz.cloud4.local:8079':
+        server: 'mp13dsapi02.dmz.cloud4.local'
+        port: 8079
+        backup: true
+  'confluentkafkarest':
+    ensure: present
+    least_conn: true
+    members:
+      'mp13dsapi01.dmz.cloud4.local:8182':
+        server: 'mp13dsapi01.dmz.cloud4.local'
+        port: 8182
+      'mp13dsapi02.dmz.cloud4.local:8182':
+        server: 'mp13dsapi02.dmz.cloud4.local'
+        port: 8182 
+        backup: true
+  'confluentschemaregistry':
+    ensure: present
+    least_conn: true
+    members:
+      'mp13dsapi01.dmz.cloud4.local:8181':
+        server: 'mp13dsapi01.dmz.cloud4.local'
+        port: 8181
+      'mp13dsapi02.dmz.cloud4.local:8181':
+        server: 'mp13dsapi02.dmz.cloud4.local'
+        port: 8181
+        backup: true
+nginx::nginx_locations:
+  'parquet':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    location: '/parquet/'
+    proxy_set_header: 
+      - 'X-Real-IP $remote_addr'
+      - 'Host $http_host'
+      - 'Connection ""'
+    proxy_http_version: '1.1'
+    proxy: 'http://mp13azkaban01.dmz.cloud4.local:9001/'
+  'datareport':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    location: '/datareport'
+    autoindex: 'on'
+  'dashboard':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    www_root: '/var/www/'
+    index_files:
+      - 'index.html'
+      - 'index.htm'
+    location_custom_cfg:
+      error_page: '405 =200 $uri'
+  'azkaban':
+    location: '/'
+    server: 'proxy-croc-azkaban.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13azkaban01.dmz.cloud4.local/'
+    proxy_redirect: 'http://mp13azkaban01.dmz.cloud4.local http://mp13azkaban01.dmz.cloud4.local/'
+  'dmcazkaban':
+    location: '/'
+    server: 'proxy-croc-dmc-azkaban.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13hdp01.cloud.cloud4.local/'
+    proxy_redirect: 'http://mp13hdp01.cloud.cloud4.local http://mp13hdp01.cloud.cloud4.local/'
+  'es':
+    location: '/'
+    server: 'proxy-croc-es.ruproxy.muc.domeus.com'
+    proxy: 'http://cerebro/'
+  'etl':
+    location: '/'
+    server: 'proxy-croc-etl.ruproxy.muc.domeus.com'
+    proxy: 'http://etlserver/'
+    proxy_redirect: 'http://mp13dsapi02.dmz.cloud4.local http://etlserver/'
+  'hbase':
+    location: '/'
+    server: 'proxy-croc-hbase.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm01.cloud.cloud4.local:60010/'
+  'hdfs':
+    location: '/'
+    server: 'proxy-croc-hdfs.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm01.cloud.cloud4.local:50070/'
+  # HDFS2 presto domain is used as it was free and there was nothing else we could get
+  'hdfs2':
+    location: '/'
+    server: 'proxy-croc-presto.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm02.cloud.cloud4.local:50070/'
+  'kafka':
+    location: '/'
+    server: 'proxy-croc-kafka.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dsqueue01.cloud.cloud4.local:8080/'
+  'streams':
+    location: '/'
+    server: 'proxy-croc-stream.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm01.cloud.cloud4.local:50060/'
+  'yarn':
+    location: '/'
+    server: 'proxy-croc-yarn.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm02.cloud.cloud4.local:50060/'
+  'yarnhistory':
+    location: '/'
+    server: 'proxy-croc-yarnhistory.ruproxy.muc.domeus.com'
+    proxy: 'http://mp13dshdm01.cloud.cloud4.local:19888/'
+  'kafkarest':
+    location: '/'
+    server: 'kafka-lb-croc.dmz.cloud4.local'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'
+    proxy: 'http://confluentkafkarest/$1'
+  'schemaregistry':
+    location: '/'
+    server: 'schema-lb-croc.dmz.cloud4.local'
+    rewrite_rules: 
+      - '^/(.*) /$1 break'
+    proxy: 'http://confluentschemaregistry/$1'
+  '~ \.php$':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    location: '~ \.php$'
+    include:
+      - 'snippets/fastcgi-php.conf'
+    fastcgi: 'unix:/run/php5-fpm.sock'
+  'drill':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    location: 'drill'
+    proxy_set_header: 
+      - 'X-Real-IP $remote_addr'
+      - 'Host $http_host'
+      - 'Connection ""'
+    proxy_http_version: '1.1'
+    location_custom_cfg:
+      proxy_pass: 'http://dshdm1101.muc.domeus.com:8047/'
+  '~ /\.ht':
+    server: 'proxy-croc-dashboard.ruproxy.muc.domeus.com'
+    location_custom_cfg:
+      deny: 'all'

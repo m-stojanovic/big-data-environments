@@ -1,0 +1,33 @@
+[general]
+pidfile="burrow.pid"
+
+[logging]
+level="info"
+use-localtime=false
+
+[client-profile.burrow]
+kafka-version="<%= @kafka_version %>"
+client-id="burrow-lagchecker"
+
+[zookeeper]
+servers= [ <%= @zookeepers %> ]
+timeout=6
+root-path="/burrow/notifier"
+
+[httpserver.burrow]
+address=":<%= @port %>"
+timeout=300
+
+
+[cluster.<%= @clustername %>]
+class-name="<%= @cluster_classname %>"
+servers=[ <%= @kafkas %> ]
+
+<% @consumers.each do |k,v| -%>
+[consumer.<%= k %>]
+class-name="<%= v['class_name'] %>"
+cluster="<%= v['cluster'] %>"
+servers=[ <%= @zookeepers %> ]
+zookeeper-timeout=<%= v['zookeeper_timeout'] %>
+zookeeper-path="<%= v['zookeeper_path'] %>"
+<% end -%>
